@@ -2,7 +2,7 @@ import React, { useReducer } from "react";
 import CartContext from "./cart-context";
 //this is the component that manages the state of all the elemetns via context api
 
-const defaultCardState = {
+const defaultCartState = {
   items: [],
   totalAmount: 0,
 };
@@ -11,17 +11,17 @@ const CardReducer = (state, actions) => {
   if (actions.type === "ADD") {
     const updatedTotalAmount =
       state.totalAmount + actions.item.price * actions.item.amount;
+
     const existingCartItemIndex = state.items.findIndex(
       (item) => item.id === actions.item.id
     );
     const existingCartItem = state.items[existingCartItemIndex];
-
     let updatedItems;
 
     if (existingCartItem) {
       const updatedItem = {
         ...existingCartItem,
-        amount: actions.item.amount + existingCartItem.amount,
+        amount: existingCartItem.amount + actions.item.amount,
       };
       updatedItems = [...state.items];
       updatedItems[existingCartItemIndex] = updatedItem;
@@ -33,12 +33,13 @@ const CardReducer = (state, actions) => {
       items: updatedItems,
       totalAmount: updatedTotalAmount,
     };
-  } else if (actions.type === "REMOVE") {
+  }
+  if (actions.type === "REMOVE") {
     const existingCartItemIndex = state.items.findIndex(
       (item) => item.id === actions.id
     );
     const existingItem = state.items[existingCartItemIndex];
-    const updatedTotalAmount = state.totalAmount - existingItem.amount;
+    const updatedTotalAmount = state.totalAmount - existingItem.price;
     let updatedItems;
     if (existingItem.amount === 1) {
       updatedItems = state.items.filter((item) => item.id !== actions.id);
@@ -47,18 +48,20 @@ const CardReducer = (state, actions) => {
       updatedItems = [...state.items];
       updatedItems[existingCartItemIndex] = updatedItem;
     }
+
     return {
       items: updatedItems,
       totalAmount: updatedTotalAmount,
     };
-  } else {
-    return defaultCardState;
   }
+
+  return defaultCartState;
 };
+
 const CartProvider = (props) => {
   const [cardState, dispatchCardAction] = useReducer(
     CardReducer,
-    defaultCardState
+    defaultCartState
   );
   const addItemToCartHandler = (item) => {
     dispatchCardAction({
