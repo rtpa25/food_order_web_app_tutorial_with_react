@@ -11,6 +11,12 @@
     padding: 0;
 }
 
+.MealsLoading {
+    text-align: center;
+    color: #fff;
+    font-size: 2rem;
+}
+
 @keyframes meals-appear {
     from {
         opacity: 0;
